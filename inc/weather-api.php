@@ -49,10 +49,10 @@ class WeatherAPI
         }
 
         try {
-            // Build geocoding request
+            // Build geocoding request with country filter
             $url = add_query_arg([
                 'name' => $postalCode,
-                'count' => 1,
+                'count' => 10, // Get multiple results to filter by country
                 'language' => 'de',
                 'format' => 'json',
             ], self::GEOCODING_API);
@@ -72,15 +72,38 @@ class WeatherAPI
             $body = wp_remote_retrieve_body($response);
             $data = json_decode($body, true);
 
-            if (empty($data['results'][0])) {
+            if (empty($data['results'])) {
                 error_log('Weather Widget: No results found for postal code ' . $postalCode);
                 return null;
             }
 
+            // Filter results by country code
+            $filteredResults = array_filter($data['results'], function($result) use ($country) {
+                return isset($result['country_code']) &&
+                       strtoupper($result['country_code']) === strtoupper($country);
+            });
+
+            if (empty($filteredResults)) {
+                // Log available countries for debugging
+                $availableCountries = array_unique(array_map(function($r) {
+                    return $r['country_code'] ?? 'unknown';
+                }, $data['results']));
+                error_log(sprintf(
+                    'Weather Widget: No results for PLZ %s in %s. Found in: %s',
+                    $postalCode,
+                    $country,
+                    implode(', ', $availableCountries)
+                ));
+                return null;
+            }
+
+            // Get first matching result
+            $firstResult = reset($filteredResults);
+
             $result = [
-                'lat' => (float) $data['results'][0]['latitude'],
-                'lon' => (float) $data['results'][0]['longitude'],
-                'name' => $data['results'][0]['name'] ?? $postalCode,
+                'lat' => (float) $firstResult['latitude'],
+                'lon' => (float) $firstResult['longitude'],
+                'name' => $firstResult['name'] ?? $postalCode,
             ];
 
             // Cache for 24 hours (postal codes don't change)
