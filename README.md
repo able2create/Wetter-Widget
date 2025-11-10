@@ -1,6 +1,6 @@
-# WordPress Wetter Widget
+# WordPress Wetter Widget 🇦🇹
 
-Ein minimalistisches, performantes Wetter-Widget für WordPress mit Open-Meteo API Integration.
+Ein minimalistisches, performantes Wetter-Widget für WordPress mit Open-Meteo API Integration - optimiert für Österreich.
 
 ## Features
 
@@ -12,45 +12,46 @@ Ein minimalistisches, performantes Wetter-Widget für WordPress mit Open-Meteo A
 - ♿ **Accessibility** (WCAG 2.1 kompatibel)
 - 🎯 **Conditional Loading** (Assets nur bei Bedarf laden)
 - 🔌 **Einfache Integration** (Shortcode, Template Tag, Widget)
-- 🌍 **Deutsche Lokalisierung**
+- 🇦🇹 **Österreichische PLZ** (4-stellig)
 - 🔒 **WordPress Coding Standards**
 
-## Verzeichnisstruktur
+## Plugin-Struktur
 
 ```
-inc/
-├── weather-widget/
-│   ├── weather-widget.php      # Hauptdatei
-│   ├── weather-api.php          # API-Integration
-│   ├── weather-admin.php        # Backend-Einstellungen
-│   ├── weather-frontend.php     # Frontend-Ausgabe
-│   └── weather-widget.css       # Styling
-└── weather-widget-loader.php    # Theme-Loader
+wetter-widget/
+├── wetter-widget.php           # Haupt-Plugin-Datei
+├── README.md                   # Dokumentation
+└── inc/
+    ├── weather-api.php         # API-Integration
+    ├── weather-admin.php       # Backend-Einstellungen
+    ├── weather-frontend.php    # Frontend-Ausgabe
+    └── weather-widget.css      # Styling
 ```
 
 ## Installation
 
-### 1. Dateien kopieren
+### Methode 1: ZIP-Upload (Empfohlen)
 
-Kopieren Sie die Verzeichnisse `inc/weather-widget/` und die Datei `inc/weather-widget-loader.php` in Ihr Theme-Verzeichnis:
+1. Laden Sie das Plugin als ZIP-Datei herunter
+2. Gehen Sie zu **Plugins > Installieren > Plugin hochladen**
+3. Wählen Sie die ZIP-Datei aus
+4. Klicken Sie auf **Jetzt installieren**
+5. Aktivieren Sie das Plugin
 
+### Methode 2: FTP/SFTP
+
+1. Laden Sie den `wetter-widget` Ordner in `/wp-content/plugins/` hoch
+2. Gehen Sie zu **Plugins** im WordPress-Admin
+3. Aktivieren Sie **Wetter Widget**
+
+### Methode 3: Git Clone
+
+```bash
+cd wp-content/plugins/
+git clone https://github.com/able2create/Wetter-Widget.git wetter-widget
 ```
-your-theme/
-├── inc/
-│   ├── weather-widget/
-│   └── weather-widget-loader.php
-└── functions.php
-```
 
-### 2. Widget aktivieren
-
-Fügen Sie folgende Zeile in Ihre `functions.php` ein:
-
-```php
-require_once get_template_directory() . '/inc/weather-widget-loader.php';
-```
-
-### 3. Einstellungen konfigurieren
+### Einstellungen konfigurieren
 
 Gehen Sie zu **Einstellungen > Wetter Widget** im WordPress Admin und konfigurieren Sie:
 

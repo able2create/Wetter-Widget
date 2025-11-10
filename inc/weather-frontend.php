@@ -207,38 +207,29 @@ class WeatherFrontend
 
     /**
      * Enqueue frontend assets
+     *
+     * @param string $pluginDir Plugin directory path
      */
-    public static function enqueueAssets(): void
+    public static function enqueueAssets(string $pluginDir): void
     {
         // Enqueue inline CSS for better performance
         wp_register_style('weather-widget', false);
         wp_enqueue_style('weather-widget');
-        wp_add_inline_style('weather-widget', self::getCriticalCSS());
+        wp_add_inline_style('weather-widget', self::getCriticalCSS($pluginDir));
     }
 
     /**
      * Get critical CSS
      *
+     * @param string $pluginDir Plugin directory path
      * @return string CSS content
      */
-    private static function getCriticalCSS(): string
+    private static function getCriticalCSS(string $pluginDir): string
     {
-        return file_get_contents(__DIR__ . '/weather-widget.css');
+        $cssFile = $pluginDir . 'inc/weather-widget.css';
+        if (file_exists($cssFile)) {
+            return file_get_contents($cssFile);
+        }
+        return '';
     }
-}
-
-/**
- * Template tag function for use in themes
- *
- * @param array $args Optional arguments
- */
-function display_weather_widget(array $args = []): void
-{
-    $settings = WeatherAdmin::getSettings();
-
-    $postalCode = $args['postal_code'] ?? $settings['postal_code'];
-    $days = $args['days'] ?? $settings['days_count'];
-    $showIcons = $args['show_icons'] ?? $settings['show_icons'];
-
-    echo WeatherFrontend::render($postalCode, (int) $days, (bool) $showIcons);
 }
