@@ -43,7 +43,7 @@ class WeatherFrontend
         $showIcons = !empty($atts['show_icons']) ? (bool) $atts['show_icons'] : (bool) $settings['show_icons'];
 
         // Validate postal code
-        if (empty($postalCode) || strlen($postalCode) !== 5) {
+        if (empty($postalCode) || strlen($postalCode) !== 4) {
             return '<div class="weather-widget weather-widget--error">
                 <p>Bitte konfigurieren Sie eine gültige Postleitzahl in den Einstellungen.</p>
             </div>';

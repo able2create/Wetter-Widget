@@ -35,10 +35,10 @@ class WeatherAPI
      * Get coordinates from postal code
      *
      * @param string $postalCode Postal code
-     * @param string $country Country code (default: DE for Germany)
+     * @param string $country Country code (default: AT for Austria)
      * @return array{lat: float, lon: float, name: string}|null
      */
-    public static function getCoordinatesFromPostalCode(string $postalCode, string $country = 'DE'): ?array
+    public static function getCoordinatesFromPostalCode(string $postalCode, string $country = 'AT'): ?array
     {
         $cacheKey = 'weather_widget_coords_' . md5($postalCode . $country);
 

@@ -139,17 +139,17 @@ class WeatherAdmin
     {
         $sanitized = [];
 
-        // Sanitize postal code (German format: 5 digits)
+        // Sanitize postal code (Austrian format: 4 digits)
         if (isset($input['postal_code'])) {
             $postalCode = sanitize_text_field($input['postal_code']);
             $postalCode = preg_replace('/[^0-9]/', '', $postalCode);
             $sanitized['postal_code'] = $postalCode;
 
-            if (strlen($postalCode) !== 5) {
+            if (strlen($postalCode) !== 4) {
                 add_settings_error(
                     self::OPTION_NAME,
                     'invalid_postal_code',
-                    'Bitte geben Sie eine gültige 5-stellige Postleitzahl ein.',
+                    'Bitte geben Sie eine gültige 4-stellige Postleitzahl ein.',
                     'error'
                 );
             }
@@ -188,13 +188,13 @@ class WeatherAdmin
             name="<?php echo esc_attr(self::OPTION_NAME); ?>[postal_code]"
             value="<?php echo $value; ?>"
             class="regular-text"
-            placeholder="z.B. 10115"
-            pattern="[0-9]{5}"
-            maxlength="5"
+            placeholder="z.B. 1010"
+            pattern="[0-9]{4}"
+            maxlength="4"
             required
         />
         <p class="description">
-            Geben Sie eine deutsche Postleitzahl ein (5 Ziffern).
+            Geben Sie eine österreichische Postleitzahl ein (4 Ziffern).
         </p>
         <?php
     }
