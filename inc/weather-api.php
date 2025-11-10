@@ -77,22 +77,47 @@ class WeatherAPI
                 return null;
             }
 
-            // Filter results by country code
+            // Debug: Log first result to see structure
+            if (!empty($data['results'][0])) {
+                error_log('Weather Widget Debug: Result structure for ' . $postalCode . ': ' .
+                    json_encode($data['results'][0], JSON_UNESCAPED_UNICODE));
+            }
+
+            // Filter results by country - check multiple possible country fields
             $filteredResults = array_filter($data['results'], function($result) use ($country) {
-                return isset($result['country_code']) &&
-                       strtoupper($result['country_code']) === strtoupper($country);
+                // Check country_code first (e.g., "AT")
+                if (isset($result['country_code'])) {
+                    return strtoupper($result['country_code']) === strtoupper($country);
+                }
+                // Check country field as fallback (e.g., "Austria" or "Österreich")
+                if (isset($result['country'])) {
+                    $countryMap = [
+                        'Austria' => 'AT',
+                        'Österreich' => 'AT',
+                    ];
+                    $countryName = $result['country'];
+                    $mappedCode = $countryMap[$countryName] ?? null;
+                    return $mappedCode === strtoupper($country);
+                }
+                return false;
             });
 
             if (empty($filteredResults)) {
-                // Log available countries for debugging
-                $availableCountries = array_unique(array_map(function($r) {
-                    return $r['country_code'] ?? 'unknown';
-                }, $data['results']));
+                // Log detailed info about what was found
+                $availableInfo = array_map(function($r) {
+                    return sprintf(
+                        '%s (country: %s, code: %s)',
+                        $r['name'] ?? 'unknown',
+                        $r['country'] ?? 'N/A',
+                        $r['country_code'] ?? 'N/A'
+                    );
+                }, array_slice($data['results'], 0, 3)); // Only log first 3
+
                 error_log(sprintf(
-                    'Weather Widget: No results for PLZ %s in %s. Found in: %s',
-                    $postalCode,
+                    'Weather Widget: No %s results for PLZ %s. Found: %s',
                     $country,
-                    implode(', ', $availableCountries)
+                    $postalCode,
+                    implode(', ', $availableInfo)
                 ));
                 return null;
             }
