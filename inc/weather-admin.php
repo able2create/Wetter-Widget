@@ -245,25 +245,10 @@ class WeatherAdmin
      */
     public static function renderCacheClearField(): void
     {
-        // Handle cache clear
-        if (isset($_POST['weather_widget_clear_cache']) && check_admin_referer('weather_widget_clear_cache')) {
-            WeatherAPI::clearCache();
-            add_settings_error(
-                self::OPTION_NAME,
-                'cache_cleared',
-                'Cache erfolgreich geleert.',
-                'success'
-            );
-        }
         ?>
-        <form method="post" style="display: inline;">
-            <?php wp_nonce_field('weather_widget_clear_cache'); ?>
-            <button type="submit" name="weather_widget_clear_cache" class="button button-secondary">
-                Cache jetzt leeren
-            </button>
-        </form>
         <p class="description">
-            Wetterinformationen werden für 30 Minuten zwischengespeichert. Leeren Sie den Cache, um neue Daten abzurufen.
+            Wetterinformationen werden für 30 Minuten zwischengespeichert.<br>
+            Verwenden Sie den Button unterhalb der Einstellungen, um den Cache zu leeren.
         </p>
         <?php
     }
@@ -312,7 +297,40 @@ class WeatherAdmin
                 submit_button('Einstellungen speichern');
                 ?>
             </form>
+
+            <hr style="margin: 30px 0;">
+
+            <h2>Cache-Verwaltung</h2>
+            <?php self::renderCacheClearButton(); ?>
         </div>
+        <?php
+    }
+
+    /**
+     * Render cache clear button (separate form)
+     */
+    public static function renderCacheClearButton(): void
+    {
+        // Handle cache clear
+        if (isset($_POST['weather_widget_clear_cache']) && check_admin_referer('weather_widget_clear_cache')) {
+            WeatherAPI::clearCache();
+            add_settings_error(
+                self::OPTION_NAME,
+                'cache_cleared',
+                'Cache erfolgreich geleert.',
+                'success'
+            );
+        }
+        ?>
+        <form method="post" style="display: inline-block;">
+            <?php wp_nonce_field('weather_widget_clear_cache'); ?>
+            <button type="submit" name="weather_widget_clear_cache" class="button button-secondary">
+                Cache jetzt leeren
+            </button>
+        </form>
+        <p class="description" style="margin-top: 10px;">
+            Wetterinformationen werden für 30 Minuten zwischengespeichert. Leeren Sie den Cache, um neue Daten abzurufen.
+        </p>
         <?php
     }
 }
