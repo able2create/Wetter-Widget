@@ -54,7 +54,7 @@ require_once get_template_directory() . '/inc/weather-widget-loader.php';
 
 Gehen Sie zu **Einstellungen > Wetter Widget** im WordPress Admin und konfigurieren Sie:
 
-- **Postleitzahl**: Deutsche PLZ (5 Ziffern)
+- **Postleitzahl**: Österreichische PLZ (4 Ziffern)
 - **Anzahl Tage**: 1-7 Tage Vorhersage
 - **Icons anzeigen**: Wetter-Icons aktivieren/deaktivieren
 
@@ -69,7 +69,7 @@ Gehen Sie zu **Einstellungen > Wetter Widget** im WordPress Admin und konfigurie
 Mit Parametern:
 
 ```
-[weather_widget postal_code="10115" days="5" show_icons="1"]
+[weather_widget postal_code="1010" days="5" show_icons="1"]
 ```
 
 ### Template Tag (in PHP-Dateien)
@@ -83,7 +83,7 @@ Mit Parametern:
 ```php
 <?php
 \WeatherWidget\display_weather_widget([
-    'postal_code' => '10115',
+    'postal_code' => '1010',
     'days' => 5,
     'show_icons' => true
 ]);
