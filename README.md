@@ -99,12 +99,12 @@ Mit Parametern:
 
 ## API-Integration
 
-Das Widget verwendet die kostenlose [Open-Meteo API](https://open-meteo.com/):
+Das Widget verwendet kostenlose Open-Source APIs:
 
-- **Geocoding API**: Konvertiert PLZ zu Koordinaten
-- **Weather Forecast API**: Liefert Wetterdaten für 7 Tage
+- **Nominatim (OpenStreetMap)**: Konvertiert PLZ zu Koordinaten - spezialisiert auf Postleitzahlen-Suche
+- **Open-Meteo API**: Liefert Wetterdaten für 7 Tage
 
-**Keine API-Keys erforderlich!** Die Open-Meteo API ist kostenlos und erfordert keine Registrierung.
+**Keine API-Keys erforderlich!** Beide APIs sind kostenlos und erfordern keine Registrierung.
 
 ## Performance-Optimierungen
 
@@ -224,6 +224,7 @@ Dieses Projekt steht unter der MIT-Lizenz.
 
 ## Credits
 
+- **Geocoding**: [Nominatim (OpenStreetMap)](https://nominatim.openstreetmap.org/)
 - **Wetterdaten**: [Open-Meteo API](https://open-meteo.com/)
 - **Icons**: [Feather Icons](https://feathericons.com/) (SVG)
 

@@ -26,13 +26,13 @@ class WeatherAPI
     private const CACHE_DURATION = 30 * MINUTE_IN_SECONDS;
 
     /**
-     * Open-Meteo API endpoints
+     * API endpoints
      */
-    private const GEOCODING_API = 'https://geocoding-api.open-meteo.com/v1/search';
+    private const NOMINATIM_API = 'https://nominatim.openstreetmap.org/search';
     private const WEATHER_API = 'https://api.open-meteo.com/v1/forecast';
 
     /**
-     * Get coordinates from postal code
+     * Get coordinates from postal code using Nominatim (OpenStreetMap)
      *
      * @param string $postalCode Postal code
      * @param string $country Country code (default: AT for Austria)
@@ -49,86 +49,50 @@ class WeatherAPI
         }
 
         try {
-            // Build geocoding request with country filter
+            // Use Nominatim for postal code search (supports postalcode parameter)
             $url = add_query_arg([
-                'name' => $postalCode,
-                'count' => 10, // Get multiple results to filter by country
-                'language' => 'de',
+                'postalcode' => $postalCode,
+                'country' => strtolower($country),
                 'format' => 'json',
-            ], self::GEOCODING_API);
+                'limit' => 1,
+                'addressdetails' => 1,
+            ], self::NOMINATIM_API);
 
             $response = wp_remote_get($url, [
                 'timeout' => 10,
                 'headers' => [
                     'Accept' => 'application/json',
+                    'User-Agent' => 'WetterWidget/1.0 WordPress Plugin',
                 ],
             ]);
 
             if (is_wp_error($response)) {
-                error_log('Weather Widget: Geocoding API error - ' . $response->get_error_message());
+                error_log('Weather Widget: Nominatim API error - ' . $response->get_error_message());
                 return null;
             }
 
             $body = wp_remote_retrieve_body($response);
             $data = json_decode($body, true);
 
-            if (empty($data['results'])) {
-                error_log('Weather Widget: No results found for postal code ' . $postalCode);
+            if (empty($data) || !isset($data[0])) {
+                error_log('Weather Widget: No results found for postal code ' . $postalCode . ' in ' . $country);
                 return null;
             }
 
-            // Debug: Log first result to see structure
-            if (!empty($data['results'][0])) {
-                error_log('Weather Widget Debug: Result structure for ' . $postalCode . ': ' .
-                    json_encode($data['results'][0], JSON_UNESCAPED_UNICODE));
-            }
+            $firstResult = $data[0];
 
-            // Filter results by country - check multiple possible country fields
-            $filteredResults = array_filter($data['results'], function($result) use ($country) {
-                // Check country_code first (e.g., "AT")
-                if (isset($result['country_code'])) {
-                    return strtoupper($result['country_code']) === strtoupper($country);
-                }
-                // Check country field as fallback (e.g., "Austria" or "Österreich")
-                if (isset($result['country'])) {
-                    $countryMap = [
-                        'Austria' => 'AT',
-                        'Österreich' => 'AT',
-                    ];
-                    $countryName = $result['country'];
-                    $mappedCode = $countryMap[$countryName] ?? null;
-                    return $mappedCode === strtoupper($country);
-                }
-                return false;
-            });
-
-            if (empty($filteredResults)) {
-                // Log detailed info about what was found
-                $availableInfo = array_map(function($r) {
-                    return sprintf(
-                        '%s (country: %s, code: %s)',
-                        $r['name'] ?? 'unknown',
-                        $r['country'] ?? 'N/A',
-                        $r['country_code'] ?? 'N/A'
-                    );
-                }, array_slice($data['results'], 0, 3)); // Only log first 3
-
-                error_log(sprintf(
-                    'Weather Widget: No %s results for PLZ %s. Found: %s',
-                    $country,
-                    $postalCode,
-                    implode(', ', $availableInfo)
-                ));
-                return null;
-            }
-
-            // Get first matching result
-            $firstResult = reset($filteredResults);
+            // Extract location name from address details
+            $locationName = $firstResult['address']['city']
+                ?? $firstResult['address']['town']
+                ?? $firstResult['address']['village']
+                ?? $firstResult['address']['municipality']
+                ?? $firstResult['display_name']
+                ?? $postalCode;
 
             $result = [
-                'lat' => (float) $firstResult['latitude'],
-                'lon' => (float) $firstResult['longitude'],
-                'name' => $firstResult['name'] ?? $postalCode,
+                'lat' => (float) $firstResult['lat'],
+                'lon' => (float) $firstResult['lon'],
+                'name' => $locationName,
             ];
 
             // Cache for 24 hours (postal codes don't change)
